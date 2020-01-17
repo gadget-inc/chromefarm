@@ -1,0 +1,69 @@
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: app-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/client-body-buffer-size: 2M
+    nginx.ingress.kubernetes.io/proxy-body-size: 10M
+spec:
+  tls:
+    - secretName: chromefarm.superpro.io-production
+      hosts:
+        - chromefarm.superpro.io
+  rules:
+    - host: chromefarm.superpro.io
+      http:
+        paths:
+          - backend:
+              serviceName: chrome
+              servicePort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: chrome
+  name: chrome
+spec:
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 3000
+  selector:
+    service: chrome
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    service: chrome
+  name: chrome
+spec:
+  replicas: 3
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        service: chrome
+    spec:
+      containers:
+        - name: chrome
+          env:
+            - name: MAX_CONCURRENT_SESSIONS=10
+              value: '10'
+
+            <% ["TOKEN"].each do |secret_env_var| %>
+            - name: <%= secret_env_var %>
+              valueFrom:
+                secretKeyRef:
+                  name: application-secrets
+                  key: <%= secret_env_var %>
+            <% end %>
+
+          image: browserless/chrome:latest
+          ports:
+            - containerPort: 3000
+      restartPolicy: Always

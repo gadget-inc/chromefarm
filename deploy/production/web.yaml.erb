@@ -2,11 +2,15 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: app-ingress
+  name: chrome-ingress
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/client-body-buffer-size: 2M
     nginx.ingress.kubernetes.io/proxy-body-size: 10M
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/send-timeout: "3600"
 spec:
   tls:
     - secretName: chromefarm.superpro.io-production
@@ -52,8 +56,10 @@ spec:
       containers:
         - name: chrome
           env:
-            - name: MAX_CONCURRENT_SESSIONS=10
+            - name: MAX_CONCURRENT_SESSIONS
               value: '10'
+            - name: DEBUG
+              value: 'browserless/chrome*'
 
             <% ["TOKEN"].each do |secret_env_var| %>
             - name: <%= secret_env_var %>

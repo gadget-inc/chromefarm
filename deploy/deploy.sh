@@ -8,4 +8,4 @@ export CLUSTER="gke_superpro-production_us-central1-a_alpha"
 GIT_SHA=$(git rev-parse HEAD)
 export REVISION=${REVISION:-$GIT_SHA}
 
-bundle exec krane render | bundle exec krane deploy --stdin --filename=deploy/$ENVIRONMENT chromefarm-production $CLUSTER
+bundle exec krane render -f ./deploy/$ENVIRONMENT | bundle exec krane deploy chromefarm-production $CLUSTER --stdin -f ./deploy/$ENVIRONMENT/secrets.ejson

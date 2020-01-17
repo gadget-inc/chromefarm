@@ -1,0 +1,34 @@
+version: 2.1
+orbs:
+  gcp-cli: circleci/gcp-cli@1.3.0
+jobs:
+  deploy:
+    docker:
+      - image: superpro/deploy-container
+    steps:
+      - checkout
+      - restore_cache: &ruby_dependencies_restore_cache
+          keys:
+            - ruby-v1-dependencies-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
+            - ruby-v1-dependencies-{{ .Branch }}-
+            - ruby-v1-dependencies-
+      - run: &ruby_dependencies
+          name: Install Ruby dependencies
+          command: bundle install --jobs=4 --retry=3 --path vendor/bundle
+      - gcp-cli/initialize
+      - run:
+          name: Configure gcloud k8s context
+          command: gcloud container clusters get-credentials alpha
+      - run:
+          name: Deploy
+          command: deploy/deploy.sh
+
+workflows:
+  version: 2
+  build_test_push:
+    jobs:
+      - deploy:
+          context: superpro-gke
+          filters:
+            branches:
+              only: master

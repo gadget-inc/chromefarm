@@ -46,7 +46,7 @@ metadata:
     service: chrome
   name: chrome
 spec:
-  replicas: 3
+  replicas: 5
   template:
     metadata:
       creationTimestamp: null
@@ -62,7 +62,7 @@ spec:
               memory: "2.5Gi"
           env:
             - name: MAX_CONCURRENT_SESSIONS
-              value: '10'
+              value: '8'
             - name: PREBOOT_CHROME
               value: 'true'
             - name: CONNECTION_TIMEOUT

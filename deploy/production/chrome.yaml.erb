@@ -78,7 +78,7 @@ spec:
                   key: <%= secret_env_var %>
             <% end %>
 
-          image: browserless/chrome:latest
+          image: browserless/chrome:1.25.0-puppeteer-2.1.0
           ports:
             - containerPort: 3000
       restartPolicy: Always

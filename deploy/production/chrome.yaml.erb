@@ -67,6 +67,15 @@ spec:
               value: 'true'
             - name: CONNECTION_TIMEOUT
               value: '300000' # 5 minutes in ms timeout, clients need to refresh their connection before 5 minutes is up
+
+            # Settings for browserless being fronted by nginx: https://docs.browserless.io/docs/docker.html#using-a-proxy
+            - name: PROXY_HOST
+              value: chromefarm.superpro.io
+            - name: PROXY_PORT
+              value: "443"
+            - name: PROXY_SSL
+              value: "true"
+
             - name: DEBUG
               value: 'browserless*'
 
